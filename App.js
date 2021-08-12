@@ -14,10 +14,14 @@ import PostScreen from "./screens/PostScreen";
 import MessageScreen from "./screens/MessageScreen";
 import NotificationScreen from "./screens/NotificationScreen";
 
+
 const AuthStack = createStackNavigator(
   {
     Login: {
       screen: LoginScreen,
+      navigationOptions: {
+        headerShown: false,
+      },
     },
     Register: {
       screen: RegisterScreen,

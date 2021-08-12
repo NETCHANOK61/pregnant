@@ -15,6 +15,7 @@ import "firebase/auth";
 import UserPermission from "../utilities/UserPermission";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+// import { ActionSheet } from "react-native-cross-actionsheet";
 
 // const firebase = require("firebase");
 // require("firebase/firestore");
@@ -26,13 +27,13 @@ export default class PostScreenV1 extends React.Component {
     image: null,
     user: {},
   };
-  // ก่อน render 
+  // ก่อน render
   componentWillUnmount() {
-    // เตรียมค่าต่างๆ ก่อน render 
+    // เตรียมค่าต่างๆ ก่อน render
     this.unsubscribe();
     _isMounted = false;
   }
-  // render นำ element ลง DOM 
+  // render นำ element ลง DOM
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -56,6 +57,7 @@ export default class PostScreenV1 extends React.Component {
                   : require("../assets/war.jpg")
               }
             ></Image>
+            {/* ข้อความบรรยาย */}
             <TextInput
               autoFocus={false}
               multiline={true}
@@ -67,18 +69,20 @@ export default class PostScreenV1 extends React.Component {
             ></TextInput>
           </View>
           <TouchableOpacity style={styles.photo} onPress={this.pickImage}>
-            <Ionicons name="md-camera" size={32} color="#D8D9DB"></Ionicons>
+            <Ionicons name="image" size={32} color="#D8D9DB" />
+            <Text>เลือกจากอัลบัม</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.photo} onPress={this.takePhoto}>
+            <Ionicons name="md-camera" size={32} color="#D8D9DB" />
+            <Text>ถ่ายภาพ</Text>
           </TouchableOpacity>
           <View style={{ marginHorizontal: 32, marginTop: 32, height: 250 }}>
-            <Image
-              source={
-                this.state.image
-                  ? { uri: this.state.image }
-                  : require("../assets/war.jpg")
-              }
-              // source={{ uri: this.state.image }}
-              style={{ width: "100%", height: "100%" }}
-            />
+            {this.state.image != null ? (
+              <Image
+                source={{ uri: this.state.image }}
+                style={{ width: "100%", height: "100%" }}
+              />
+            ) : null}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -88,8 +92,8 @@ export default class PostScreenV1 extends React.Component {
   // หลังจาก render เสร็จ
   componentDidMount() {
     // this._isMounted = true;
+    UserPermission.getAllCameraPermission();
     _isMounted = true;
-    UserPermission.getCameraPermission();
     const user = this.props.uid || Fire.shared.uid;
 
     this.unsubscribe = Fire.shared.firestore
@@ -111,15 +115,32 @@ export default class PostScreenV1 extends React.Component {
         alert(error);
       });
   };
+  
   pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       allowsMultipleSelection: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
+      quality: 0.5,
     });
     if (!result.cancelled) {
       this.setState({ image: result.uri });
+    } else {
+      this.setState({ image: null });
+    }
+  };
+
+  takePhoto = async () => {
+    let data = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      allowsMultipleSelection: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+    if (!data.cancelled) {
+      this.setState({ image: data.uri });
     } else {
       this.setState({ image: null });
     }
@@ -151,5 +172,11 @@ const styles = StyleSheet.create({
   photo: {
     alignItems: "flex-end",
     marginHorizontal: 32,
+  },
+  containerLoad: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -37,7 +37,6 @@ class Fire {
     return new Promise(async (res, rej) => {
       const response = await fetch(uri);
       const file = await response.blob();
-
       let upload = firebase.storage().ref(filename).put(file);
       upload.on(
         "state_changed",
@@ -93,9 +92,11 @@ class Fire {
       .doc(postId)
       .delete()
       .then(() => {
-        Alert.alert("Post deleted!", "Your post has been deleted successfully");
+        Alert.alert("ดำเนินการเสร็จสิ้น!", "เราได้ลบโพสต์ของคุณออกจากระบบเรียบร้อยแล้ว",[
+          {text:'รับทราบ'}
+        ]);
       })
-      .catch((e) => console.log("Error deleting post", e));
+      .catch((e) => console.log("เกิดข้อผิดพลาด ไม่สามารถลบโพสต์นี้ได้", e));
   };
 
   deletePost = (postId) => {

@@ -7,11 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import Fire from "./Fire";
-import { Dimensions } from "react-native";
 import UserPermission from "../utilities/UserPermission";
 import * as ImagePicker from "expo-image-picker";
 
@@ -47,12 +47,12 @@ export default class RegisterScreen extends React.Component {
     return (
       <View style={styles.container}>
         <StatusBar style="auto" />
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.btn_back}
           onPress={() => this.props.navigation.goBack()}
         >
           <Ionicons name="arrow-back" color="#000" size={32}></Ionicons>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={styles.greeting}>{`Hello!\nSign Up to started.`}</Text>
         <TouchableOpacity
           style={styles.avatarPlaceholder}
@@ -126,8 +126,7 @@ export default class RegisterScreen extends React.Component {
     );
   }
 }
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
+const { windowWidth, windowHeight } = Dimensions.get("window");
 const styles = StyleSheet.create({
   btn_back: {
     position: "absolute",
