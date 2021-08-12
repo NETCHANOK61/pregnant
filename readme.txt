@@ -6,6 +6,10 @@ install
 - expo install expo-camera
 - expo install expo-constants
 
+package to bottom action sheet
+- expo install react-native-reanimated 
+- expo install react-native-redash
+
 frequent problems
 - yarn add react-native-gesture-handler
 - npm install firebase

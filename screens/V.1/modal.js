@@ -1,23 +1,37 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
+
 import firebase from "firebase";
 import Fire from "./Fire";
 import "firebase/auth";
+
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-export default class HomeScreen extends React.Component {
+export default class Modal extends React.Component {
   // รับค่า props
   // setState default
   constructor(props) {
     super(props);
     this.state = {
+      modalVisible: false,
       list: [],
       user: [],
     };
   }
-
+  setModalVisible = (visible) => {
+    this.setState({ modalVisible: visible });
+  };
   // ก่อน render
   componentWillUnmount() {
     // เตรียมค่าต่างๆ ก่อน render
@@ -46,8 +60,49 @@ export default class HomeScreen extends React.Component {
 
   // render ในแต่ละ flatlist
   renderPost = (post) => {
+    const { modalVisible } = this.state;
     return (
       <View style={styles.feedItem}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            this.setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                ต้องการลบโพสต์นี้ใช่หรือไม่
+                หากลบแล้วระบบจะไม่สามารถกู้คืนข้อมูลได้
+              </Text>
+
+              <View style={{ flexDirection: "row" }}>
+                <View>
+                  <Pressable
+                    style={[styles.button, styles.buttonNo]}
+                    onPress={() => this.setModalVisible(!modalVisible)}
+                  >
+                    <Text style={styles.textStyle}>ยกเลิก</Text>
+                  </Pressable>
+                </View>
+                <View>
+                  <Pressable
+                    style={[styles.button, styles.buttonYes]}
+                    onPress={() => [
+                      this.deleteHandle(post.key),
+                      this.setModalVisible(!modalVisible),
+                    ]}
+                  >
+                    <Text style={styles.textStyle}>ตกลง</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
         <Image
           style={styles.avatar}
           source={
@@ -68,15 +123,7 @@ export default class HomeScreen extends React.Component {
               <Text style={styles.name}>{this.state.user.name}</Text>
               {/* แสดงเวลาโพสต์ */}
               <Text style={styles.timestamp}>
-                {new Date(post.timestamp)
-                  .toLocaleString("th-TH", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour:"2-digit",
-                    minute:'2-digit'
-                  })
-                  .replace(/(\d+)\/(\d+)\/(\d+)/, "โพสต์เมื่อ $1/$2/$3 เวลา")}
+                {new Date(post.timestamp).toUTCString()}
               </Text>
             </View>
           </View>
@@ -86,9 +133,11 @@ export default class HomeScreen extends React.Component {
             style={styles.postImage}
             resizeMode="cover"
           />
-          {/* ปุ่มลบ */}
-          <TouchableOpacity style={{ alignItems:'flex-end'}}onPress={() => this.deleteHandle(post.key)}>
-            <Ionicons name="trash" size={24} color="#FF0000"></Ionicons>
+          {/* <TouchableOpacity onPress={() => this.deleteHandle(post.key)}>
+            <Ionicons name="trash" size={24} color="tomato"></Ionicons>
+          </TouchableOpacity> */}
+          <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
+            <Ionicons name="trash" size={24} color="tomato"></Ionicons>
           </TouchableOpacity>
         </View>
       </View>
@@ -97,17 +146,16 @@ export default class HomeScreen extends React.Component {
 
   // กดลบ
   deleteHandle = (id) => {
-    Alert.alert("ต้องการลบโพสต์หรือไม่?", "โพสต์ดังกล่าวจะถูกลบโดยถาวร", [
-      {
-        text: "ยกเลิก",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel",
-      },
-      { text: "ลบ", onPress: () => Fire.shared.deletePost(id) },
-    ]);
+    Fire.shared.deletePost(id);
   };
 
   // หลังจาก render เสร็จ
+  _onRefresh() {
+    this.setState({ refreshing: true });
+    fetchData().then(() => {
+      this.setState({ refreshing: false });
+    });
+  }
   componentDidMount() {
     _isMounted = true;
     const user = this.props.uid || Fire.shared.uid;
@@ -137,6 +185,8 @@ export default class HomeScreen extends React.Component {
   }
 }
 
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -179,22 +229,65 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: "500",
-    color: "#838899",
+    color: "#454D65",
   },
   timestamp: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#C4C6CE",
     marginTop: 4,
   },
   post: {
     marginTop: 16,
-    fontSize: 15,
-    fontWeight:"500",
-    color: "#454D65",
+    fontSize: 14,
+    color: "#838899",
   },
   postImage: {
     height: 150,
     borderRadius: 5,
     marginVertical: 16,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: windowHeight * 0.05,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    width: windowWidth * 0.8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    margin: windowWidth * 0.05,
+  },
+  buttonYes: {
+    backgroundColor: "#FF1E1E",
+  },
+  buttonNo: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  modalText: {
+    marginBottom: 15,
+    fontWeight: "500",
+    textAlign: "center",
   },
 });
