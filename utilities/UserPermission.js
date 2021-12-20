@@ -5,7 +5,7 @@ import { Camera } from "expo-camera";
 
 class UserPermissions {
   getAllCameraPermission = async () => {
-    if (Constants.platform.os || Constants.platform.android) {
+    if (Constants.platform.ios || Constants.platform.android) {
       const { status } = ImagePicker.requestMediaLibraryPermissionsAsync();
       const { granted } = await Camera.requestPermissionsAsync();
       if (status === false) {

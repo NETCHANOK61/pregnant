@@ -30,7 +30,7 @@ export default class RegisterScreen extends React.Component {
     errorMessage: null,
   };
   handlePickAvatar = async () => {
-    UserPermission.getCameraPermission();
+    UserPermission.getAllCameraPermission();
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   greeting: {
-    marginTop: 0.05 * windowHeight,
+    marginTop: 32,
     fontSize: 18,
     fontWeight: "400",
     textAlign: "center",
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: "#E1E2E6",
     marginTop: 48,
-    marginLeft: windowWidth / 2.8,
+    marginLeft: 50,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 50,

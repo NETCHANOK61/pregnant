@@ -31,7 +31,7 @@ export default class LoginScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Text style={styles.greeting}>{`Hello again.\nWelcome back.`}</Text>
         <View style={styles.errorMessage}>
           {this.state.errorMessage && (

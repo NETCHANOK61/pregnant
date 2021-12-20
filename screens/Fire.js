@@ -1,7 +1,7 @@
 import firebase from "firebase";
 import { Alert } from "react-native";
 import FirebaseKeys from "../Config";
-import firestore from 'firebase/firestore'
+import firestore from "firebase/firestore";
 
 class Fire {
   constructor() {
@@ -10,17 +10,19 @@ class Fire {
     }
   }
   addPost = async ({ text, localUri }) => {
+    // รอรอให้อัปโหลดรูปลง storage ก่อน จึงจะเพิ่มโพสต์ได้
     const remoteUri = await this.uploadPhotoAsync(
       localUri,
+      // path ใน storage
       `photos/${this.uid}/${Date.now()}`
     );
 
     return new Promise((res, rej) => {
-      const ref = this.firestore.collection("posts");
+      const ref = this.firestore.collection("users").doc(this.uid);
       ref
+        .collection("posts")
         .add({
           text,
-          uid: this.uid,
           timestamp: this.timestamp,
           image: remoteUri,
         })
@@ -33,6 +35,7 @@ class Fire {
     });
   };
 
+  // อัปโหลดรูปลง storage
   uploadPhotoAsync = async (uri, filename) => {
     return new Promise(async (res, rej) => {
       const response = await fetch(uri);
@@ -52,6 +55,7 @@ class Fire {
     });
   };
 
+  // สร้าง user
   createUser = async (user) => {
     let remoteUri = null;
     try {
@@ -74,6 +78,7 @@ class Fire {
               if (user.avatar) {
                 remoteUri = await this.uploadPhotoAsync(
                   user.avatar,
+                  // path ใน storage
                   `avatars/${this.uid}`
                 );
                 userRef.set({ avatar: remoteUri }, { merge: true });
@@ -86,23 +91,29 @@ class Fire {
     }
   };
 
+  // ลบรูปใน storage
   deleteFireStoreData = (postId) => {
-    const ref = this.firestore.collection("posts");
+    const ref = this.firestore.collection("users").doc(this.uid);
     ref
+      .collection("posts")
       .doc(postId)
       .delete()
       .then(() => {
-        Alert.alert("ดำเนินการเสร็จสิ้น!", "เราได้ลบโพสต์ของคุณออกจากระบบเรียบร้อยแล้ว",[
-          {text:'รับทราบ'}
-        ]);
+        Alert.alert(
+          "ดำเนินการเสร็จสิ้น!",
+          "เราได้ลบโพสต์ของคุณออกจากระบบเรียบร้อยแล้ว",
+          [{ text: "รับทราบ" }]
+        );
       })
       .catch((e) => console.log("เกิดข้อผิดพลาด ไม่สามารถลบโพสต์นี้ได้", e));
   };
 
+  // ลบโพสต์ 
   deletePost = (postId) => {
     console.log("Now post ", postId);
-    const ref = this.firestore.collection("posts");
-      ref
+    const ref = this.firestore.collection("users").doc(this.uid);
+    ref
+      .collection("posts")
       .doc(postId)
       .get()
       .then((documentSnapshort) => {

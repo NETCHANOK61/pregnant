@@ -73,8 +73,8 @@ export default class HomeScreen extends React.Component {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
-                    hour:"2-digit",
-                    minute:'2-digit'
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })
                   .replace(/(\d+)\/(\d+)\/(\d+)/, "โพสต์เมื่อ $1/$2/$3 เวลา")}
               </Text>
@@ -87,7 +87,10 @@ export default class HomeScreen extends React.Component {
             resizeMode="cover"
           />
           {/* ปุ่มลบ */}
-          <TouchableOpacity style={{ alignItems:'flex-end'}}onPress={() => this.deleteHandle(post.key)}>
+          <TouchableOpacity
+            style={{ alignItems: "flex-end" }}
+            onPress={() => this.deleteHandle(post.key)}
+          >
             <Ionicons name="trash" size={24} color="#FF0000"></Ionicons>
           </TouchableOpacity>
         </View>
@@ -110,17 +113,17 @@ export default class HomeScreen extends React.Component {
   // หลังจาก render เสร็จ
   componentDidMount() {
     _isMounted = true;
-    const user = this.props.uid || Fire.shared.uid;
+    const userID = this.props.uid || Fire.shared.uid;
 
     this.unsubscribe = Fire.shared.firestore
       .collection("users")
-      .doc(user)
+      .doc(userID)
       .onSnapshot((doc) => {
         this.setState({ user: doc.data() });
       });
-    const ref = firebase.firestore().collection("posts");
+
+    const ref = firebase.firestore().collection("users").doc(userID).collection("posts");
     ref
-      .where("uid", "==", user)
       .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) => {
         var li = [];
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
   post: {
     marginTop: 16,
     fontSize: 15,
-    fontWeight:"500",
+    fontWeight: "500",
     color: "#454D65",
   },
   postImage: {

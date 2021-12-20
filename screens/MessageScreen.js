@@ -1,107 +1,59 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Button, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import * as firebase from "firebase";
+import CountKickScreen from "./CountKickScreen";
+import ReportScreen from "./ReportScreen";
+import { createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
+
+// class MainScreen extends React.Component {
+//   render() {
+//     return (
+//       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+//         <Button
+//           title="นับลูกดิ้น"
+//           onPress={() => this.props.navigation.navigate("Kick")}
+//         />
+//         <Button
+//           title="รายงานคุณหมอ"
+//           onPress={() => this.props.navigation.navigate("Reported")}
+//         />
+//       </View>
+//     );
+//   }
+// }
+
+// const RootStack = createStackNavigator(
+//   {
+//     Kick: CountKickScreen,
+//     Main: MainScreen,
+//     Reported: ReportScreen,
+//   },
+//   {
+//     initialRouteName: "Main",
+//   }
+// );
+// const AppContainer = createAppContainer(RootStack);
 
 export default class MessageScreen extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      time: 60,
-      count: 0,
-      startVisible: true,
-      restartVisible: false,
-      kickVisible: false,
-      saveVisible: false,
-    };
-  }
-  componentDidMount() {
-    // this.startTimer(); เปิดหน้าแล้วเริ่มนับถอยหลังเลย
-  }
-  // เริ่มนับถอยหลัง
-  startTimer = () => {
-    this.setState({
-      startVisible: false,
-      restartVisible: true,
-      kickVisible: true,
-    });
-    this.timer = setInterval(() => {
-      this.tick();
-    }, 1000);
-  };
-  tick = () => {
-    let time = this.state.time;
-    time -= 1;
-    this.setState({ time });
-    if (time <= 0) {
-      clearInterval(this.timer);
-      this.setState({
-        restartVisible: true,
-        kickVisible: false,
-        saveVisible: true,
-      });
-    }
-  };
-  // รีเซ็ทตัวนับถอยหลัง
-  restartTimer = () => {
-    clearInterval(this.timer);
-    this.setState({
-      time: 60,
-      count: 0,
-      startVisible: true,
-      restartVisible: false,
-      kickVisible: false,
-    });
-  };
-  // นับการถีบท้อง
-  kickCount = () => {
-    let count = this.state.count;
-    count += 1;
-    this.setState({ count });
-  };
-  // บันทึกลงฐานข้อมูล
-  save = () => {
-    Alert.alert("จำนวนการดิ้น : " + this.state.count);
-    this.setState({
-      time: 5,
-      count: 0,
-      startVisible: true,
-      restartVisible: false,
-      kickVisible: false,
-      saveVisible: false,
-    });
-  };
-
-  componentWillUnmount() {
-    clearInterval(this.timer);
-  }
-
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar style="dark" />
-        <Text>Countdown: {this.state.time}</Text>
-        <Text>Kick: {this.state.count}</Text>
-        {this.state.startVisible ? (
-          <TouchableOpacity onPress={() => this.startTimer()}>
-            <Text>Start</Text>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Other</Text>
+        </View>
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate("Kick")}
+          >
+            <Text>นับลูกดิ้น</Text>
           </TouchableOpacity>
-        ) : null}
-        {this.state.restartVisible ? (
-          <TouchableOpacity onPress={() => this.restartTimer()}>
-            <Text>Re-Start</Text>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate("Report")}
+          >
+            <Text>รายงานแพทย์</Text>
           </TouchableOpacity>
-        ) : null}
-        {this.state.kickVisible ? (
-          <TouchableOpacity onPress={() => this.kickCount()}>
-            <Text>kick</Text>
-          </TouchableOpacity>
-        ) : null}
-        {this.state.saveVisible ? (
-          <TouchableOpacity onPress={() => this.save()}>
-            <Text>save</Text>
-          </TouchableOpacity>
-        ) : null}
+        </View>
       </View>
     );
   }
@@ -110,7 +62,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  header: {
+    paddingTop: 64,
+    paddingBottom: 16,
+    backgroundColor: "#FFF",
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderBottomColor: "#EBECF4",
+    shadowColor: "#454D65",
+    shadowOffset: { height: 5 },
+    shadowRadius: 15,
+    shadowOpacity: 0.2,
+    zIndex: 10,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "500",
   },
 });

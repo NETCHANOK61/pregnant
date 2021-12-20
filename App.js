@@ -14,6 +14,8 @@ import PostScreen from "./screens/PostScreen";
 import MessageScreen from "./screens/MessageScreen";
 import NotificationScreen from "./screens/NotificationScreen";
 
+import CountKickScreen from "./screens/CountKickScreen";
+import ReportScreen from "./screens/ReportScreen";
 
 const AuthStack = createStackNavigator(
   {
@@ -47,13 +49,33 @@ const AppContainer = createStackNavigator(
           },
         },
         Message: {
-          screen: MessageScreen,
+          screen: createStackNavigator({
+            My: {
+              screen: MessageScreen,
+              navigationOptions: {
+                headerShown: false,
+              },
+            },
+            Kick: {
+              screen: CountKickScreen,
+              navigationOptions: {
+                // headerShown: false,
+              },
+            },
+            Report: {
+              screen: ReportScreen,
+              navigationOptions: {
+                // headerShown: false,
+              },
+            },
+          }),
           navigationOptions: {
             tabBarIcon: ({ tintColor }) => (
               <Ionicons name="chatbox" size={24} color={tintColor} />
             ),
           },
         },
+
         Post: {
           screen: PostScreen,
           navigationOptions: {
@@ -104,7 +126,7 @@ const AppContainer = createStackNavigator(
           inactiveTintColor: "#B8BBC4",
           showLabel: false,
         },
-        initialRouteName:"Home"
+        initialRouteName: "Home",
       }
     ),
     postModal: {
